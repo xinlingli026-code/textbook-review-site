@@ -7,7 +7,8 @@
  *
  * 指标: katex(公式数) / mathRaw(降级数) / pSolution(题卡) / scopeCard(考纲卡)
  *       / pOfficial(官方解答块) / pSrc(出处行) / formulaRow(公式表条目) / chip(筛选按钮)
- * 退出码: 0 = 全部通过；1 = 有指标未达预期或出现 math-raw 降级。
+ *       / cjkFormula(被误排成公式的中文块数，必须为 0)
+ * 退出码: 0 = 全部通过；1 = 有指标未达预期、出现 math-raw 降级、或有中文被排成公式。
  *
  * 注意: 记忆卡是单卡轮播，DOM 里数不到；需要真实计数就在 Node 里加载站点的数据文件统计。
  * 中英两版要分别导出 DOM 再各跑一次，数字应当一致（不一致 = 双语数据漂移）。
@@ -17,6 +18,19 @@ const fs = require('fs');
 function count(html, pattern) {
   const m = html.match(pattern);
   return m ? m.length : 0;
+}
+
+// KaTeX 把每个公式的原始 TeX 放在 annotation 里。去掉故意的 \text{...} 之后
+// 仍有中文，说明正文（多半是金额里的裸 $）被当成了公式定界符。
+function cjkFormulas(html) {
+  const out = [];
+  const re = /<annotation encoding="application\/x-tex">([\s\S]*?)<\/annotation>/g;
+  let m;
+  while ((m = re.exec(html))) {
+    const stripped = m[1].replace(/\\text\{[^{}]*\}/g, '').replace(/\\text\{[^{}]*\{[^{}]*\}[^{}]*\}/g, '');
+    if (/[一-鿿]/.test(stripped)) out.push(m[1].replace(/\s+/g, ' ').slice(0, 120));
+  }
+  return out;
 }
 
 function metrics(html) {
@@ -32,6 +46,7 @@ function metrics(html) {
     formulaRow: count(html, /class="sh-item"/g),
     pitfall: count(html, /class="pit"/g),
     chip: count(html, /class="chip"/g),
+    cjkFormula: cjkFormulas(html).length,
   };
 }
 
@@ -64,6 +79,11 @@ function main() {
     for (const [k, v] of Object.entries(m)) console.log(`   ${k.padEnd(12)} ${v}`);
     if (m.mathRaw > 0) {
       console.log(`   !! math-raw 降级 ${m.mathRaw} 处：KaTeX 未加载或公式写法有误`);
+      failed = true;
+    }
+    if (m.cjkFormula > 0) {
+      console.log(`   !! cjkFormula ${m.cjkFormula} 处：正文被当成公式排版（多半是金额里的裸 $）`);
+      for (const t of cjkFormulas(html).slice(0, 5)) console.log(`      > ${t}`);
       failed = true;
     }
     for (const [k, want] of Object.entries(expect)) {

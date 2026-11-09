@@ -78,6 +78,28 @@ const HW3D = [
 - 离线时 KaTeX 不在 → 公式降级为等宽原式 `.math-raw`，可读性不能塌。
 - 官方解答这类长 LaTeX 建议包一层独立容器（浅色底 + 出处小字），与自写解法视觉区分。
 
+### 货币符号 `$` 会与数学定界符配对
+
+站点用 `$…$` 写公式，所以题干里的**金额**（`$1000`、`$1197.22`）会被当成开定界符，
+与后面某个 `$` 配对，把整段中文当公式排。实测症状：中文出现在 `cjk_fallback` 里、
+被排成斜体数学字，金额前的 `$` 消失。
+
+正确写法：`$\text{\$}1000$`（渲染结果就是字面量 `$1000`）。
+`\textdollar` 在 KaTeX 0.16.9 **不被支持**，会渲染成红色错误文本，不要用。
+
+检测（导出 DOM 后跑一遍，应为 0）：KaTeX 会把每个公式的原始 TeX 放在
+`<annotation encoding="application/x-tex">` 里；把 `\text{...}` 段去掉后若仍有中文，
+就是误配对。
+
+```js
+const bad = [...html.matchAll(/<annotation encoding="application\/x-tex">([\s\S]*?)<\/annotation>/g)]
+  .filter(m => /[一-鿿]/.test(m[1].replace(/\\text\{[^{}]*\}/g, '')));
+console.log('accidental CJK formulas =', bad.length);
+```
+
+另外注意 JS 源码里的转义层数：源码里写 `\\text{\\$}` 才在运行时得到 `\text{\$}`；
+少一个反斜杠就会退化成裸 `$`。
+
 ## 校验指标
 
 每个「语言 × 专题」跑一次无头导出，至少核对：

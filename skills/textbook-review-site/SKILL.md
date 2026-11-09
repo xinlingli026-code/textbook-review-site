@@ -73,6 +73,8 @@ description: |
 6. **渲染层三件套**
    KaTeX CDN 渲染 `$...$`、离线时降级为 `.math-raw` 原式、所有来自数据的文本经 `esc()` 转义。
    新增数据字段若要显示在页面上，先在 `renderXxx()` 里补渲染分支并加对应 CSS 类。
+   题干里的**金额**要写成 `$\text{\$}1000$`：裸 `$` 会和后面的 `$` 配对，把整段中文排成公式。
+   详见 `references/site-architecture.md` 的「货币符号 `$`」段落。
 
 7. **无头浏览器做渲染校验（不要只靠肉眼看截图）**
    Edge headless `--dump-dom` 导出 DOM，统计：KaTeX 公式数、`.math-raw` 降级数（必须为 0）、
