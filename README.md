@@ -67,6 +67,9 @@ Windows 注意事项（PowerShell BOM、`python` 而非 `python3`、Edge headles
 本仓库只有方法、脚本与文档，**不含任何教材原文或官方详解转写**。用它生成的站点若收录官方解答，
 属于第三方版权内容的公开分发，需要在站点 `DISCLAIMER.md` 里写明来源、逐题标注页码，并承诺可按要求移除。
 
+`docs/evaluation.md` 记录了这个 skill 的实测评估（同一道任务、带/不带 skill 各跑一遍），
+以及由此沉淀下来的「已踩过的坑」清单。
+
 ## License
 
 MIT
