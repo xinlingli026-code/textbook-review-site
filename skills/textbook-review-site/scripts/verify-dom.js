@@ -41,6 +41,9 @@ function metrics(html) {
     pCard: count(html, /class="p-card"/g),
     pOfficial: count(html, /class="p-official"/g),
     pSrc: count(html, /class="p-src"/g),
+    // p-official 是**容器**数：只有出处行（src）时也会渲染一个空壳容器。
+    // 真正带官方解答内容的块数 = 官方标签数（每个官方块恰好一个 .lbl）。
+    officialLabel: count(html, /<div class="lbl">/g),
     scopeCard: count(html, /class="scope-card"/g),
     // 注意：sh-item 是「公式速查表」的每一行，不是记忆卡；记忆卡是单卡轮播，DOM 里数不到
     formulaRow: count(html, /class="sh-item"/g),

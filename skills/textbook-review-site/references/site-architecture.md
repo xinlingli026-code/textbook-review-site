@@ -110,7 +110,8 @@ console.log('accidental CJK formulas =', bad.length);
 | `math-raw` | **0**（无降级） |
 | `class="p-solution"` | = 该专题题卡总数（中文版与英文版一致） |
 | `class="scope-card"` | = 该专题考纲卡数 |
-| `class="p-official"` | = 收录官方解答的题数 |
+| `class="p-official"` | **容器数** ≥ 官方内容数（只有出处行时也会渲染空壳容器） |
+| `<div class="lbl">` | = 真正带官方解答内容的题数 |
 | `class="sh-item"` | = 公式表条目数（**不是记忆卡**，记忆卡是单卡轮播，DOM 里数不到） |
 | 跨专题串味 | Ch2 视图不应出现 Ch3 小节标题（数值巧合要人工看上下文） |
 
