@@ -6,6 +6,9 @@
  *   node build-bank.js <spec.json> [--out-dir <site-root>]
  *
  * spec.json 结构见 references/site-architecture.md 的「内容层数据模型」。
+ * 字段可以是字符串，也可以是 {zh, en} 对象（按语言取；字符串两版共用）。
+ * ans 支持 {zh, en}：答案里常带「即」「厘米/秒」这类中文措辞，
+ * 不分语言会把中文泄漏到英文版。q / steps / src / type / note 同理。
  * 生成的文件为纯 UTF-8（无 BOM）、LF 换行，直接被 <script src> 引入。
  * 不依赖任何第三方包。
  */
@@ -41,7 +44,7 @@ function renderItem(item, lang) {
   lines.push('  {');
   lines.push(`    sec: ${js(item.sec)}, num: ${item.num}, page: ${item.page}, type: ${js(pick(item.type, lang, ''))},`);
   lines.push(`    q: ${js(pick(item.q, lang, ''))},`);
-  if (item.ans !== undefined) lines.push(`    ans: ${js(item.ans)},`);
+  if (item.ans !== undefined) lines.push(`    ans: ${js(pick(item.ans, lang, ''))},`);
   const steps = pick(item.steps, lang, []);
   if (Array.isArray(steps) && steps.length) {
     lines.push(`    steps: [${steps.map(js).join(', ')}],`);
